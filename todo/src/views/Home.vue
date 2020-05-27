@@ -1,16 +1,15 @@
 <template>
-  <div>
+  <b-container>
     <b-list-group>
       <b-list-group-item
         v-for="(item, index) in todoItems"
         :key="index"
-        v-if="!item.done"
+        v-show="!item.deleted"
+        class="todo-item"
       >
-        <b-form-checkbox
-          v-model="item.done"
-        >
-          {{item.title}}
-        </b-form-checkbox>
+        <div class="title" :class="{'done': item.done}">{{item.title}}</div>
+        <b-form-checkbox v-model="item.done" />
+        <b-icon-x-circle @click="deleteTodo(index)" />
       </b-list-group-item>
     </b-list-group>
 
@@ -20,7 +19,13 @@
         v-model="newTodo"
       ></b-form-input>
     </form>
-  </div>
+
+    <div>
+      HISTORY TODO
+      <p>Have an edit button that needs to be clicked before
+      you can delete tasks</p>
+    </div>
+  </b-container>
 </template>
 
 <script>
@@ -36,10 +41,14 @@ export default {
     createTodo() {
       this.todoItems.push({
         title: this.newTodo,
-        done: false
+        done: false,
+        deleted: false,
       })
 
       this.newTodo = ''
+    },
+    deleteTodo(index) {
+      this.todoItems[index].deleted = true
     }
   },
   data () {
@@ -49,13 +58,31 @@ export default {
         {
           title: 'todo1',
           done: false,
+          deleted: false,
         },
         {
           title: 'todo2',
           done: false,
+          deleted: false,
         }
       ]
     }
   }
 }
 </script>
+
+<style lang="scss">
+  .list-group-item.todo-item {
+    display: flex;
+    align-items: center;
+
+    .title {
+      flex-grow: 1;
+      text-align: left;
+
+      &.done {
+        text-decoration: line-through;
+      }
+    }
+  }
+</style>
