@@ -1,15 +1,16 @@
 <template>
   <b-list-group>
-    <b-list-group-item
-      v-for="(item, index) in todoItems"
-      :key="index"
-      v-show="!item.deleted"
-      class="todo-item"
-    >
-      <div class="title" :class="{'done': item.done}">{{item.title}}</div>
-      <b-form-checkbox v-model="item.done" />
-      <b-icon-x-circle class="delete" @click="deleteTodo(index)" />
-    </b-list-group-item>
+    <transition-group name="todo-list">
+      <b-list-group-item
+        v-for="item in $store.getters['app/todoItems']"
+        :key="item.id"
+        class="todo-item"
+      >
+        <div class="title" :class="{'done': item.done}">{{item.title}}</div>
+        <b-form-checkbox v-model="item.done" />
+        <b-icon-x-circle class="delete" @click="deleteTodo(item.id)" />
+      </b-list-group-item>
+    </transition-group>
   </b-list-group>
 </template>
 
@@ -19,17 +20,8 @@ import store from '../store'
 export default {
   name: 'TodoList',
   methods: {
-    deleteTodo(index) {
-      this.todoItems[index].deleted = true
-    }
-  },
-  data () {
-    return {
-    }
-  },
-  computed: {
-    todoItems() {
-      return store.getters['app/getTodoItems']
+    deleteTodo(id) {
+      store.commit('app/deleteTodo', id)
     }
   }
 }
@@ -48,5 +40,14 @@ export default {
         text-decoration: line-through;
       }
     }
+  }
+
+  .todo-list-enter-active, .todo-list-leave-active {
+    transition: all 1s;
+  }
+
+  .todo-list-enter, .todo-list-leave-to {
+    opacity: 0;
+    transform: translateX(500px);
   }
 </style>
