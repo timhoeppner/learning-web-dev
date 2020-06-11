@@ -25,3 +25,8 @@ Route::get('test', function () {
     'number' => 1
   ]);
 });
+
+Route::group(['prefix' => 'todo'], function () {
+  Route::get('', 'TodoController@index');
+  Route::post('create', 'TodoController@create');
+});
