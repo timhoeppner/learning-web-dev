@@ -10,7 +10,7 @@ class TodoController extends Controller
     public function index()
     {
       return response()->json(
-        Todo::where('title', 'my new todo item')->get()
+        Todo::where('deleted', false)->get()
       );
     }
 
@@ -24,6 +24,29 @@ class TodoController extends Controller
       return response()->json([
         'result' => $result,
         'todo' => $todo
+      ]);
+    }
+
+    public function state(Request $request, Todo $todo)
+    {
+      $todo->done = $request->done;
+      $result = $todo->save();
+
+      return response()->json([
+        'result' => $result,
+        'todo' => $todo
+      ]);
+    }
+
+    public function delete(Todo $todo)
+    {
+      $todo->deleted = true;
+      $result = $todo->save();
+
+      return response()->json([
+        'result' => $result,
+        'todo' => $todo,
+        'all' => Todo::where('deleted', false)->get()
       ]);
     }
 }

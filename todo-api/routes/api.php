@@ -29,4 +29,6 @@ Route::get('test', function () {
 Route::group(['prefix' => 'todo'], function () {
   Route::get('', 'TodoController@index');
   Route::post('create', 'TodoController@create');
+  Route::post('state/{todo}', 'TodoController@state');
+  Route::post('delete/{todo}', 'TodoController@delete');
 });

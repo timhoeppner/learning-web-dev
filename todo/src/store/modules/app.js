@@ -1,3 +1,7 @@
+import axios from 'axios'
+
+const apiBase = 'http://localhost:8081/api/todo'
+
 export default {
   namespaced: true,
   state: {
@@ -12,48 +16,58 @@ export default {
   actions: {
     getTodoItems: ({commit}) => {
       return new Promise((resolve, reject) => {
-        commit('setTodoItems', [
-          {
-            id: 1,
-            title: 'todo1',
-            done: false,
-            deleted: false,
-          },
-          {
-            id: 2,
-            title: 'todo2',
-            done: false,
-            deleted: false,
-          }
-        ])
-
-        //reject(new Error('API failed'))
-
-        setTimeout(() => {
-          console.log('got my data')
-          resolve()
-        }, 1000)
+        axios.get(apiBase)
+          .then(response => {
+            commit('setTodoItems', response.data)
+            resolve()
+          })
+          .catch(error => {
+            reject(new Error('Error accessing API: ' + error))
+          })
+      })
+    },
+    setTodoState: ({state, dispatch}, data) => {
+      return new Promise((resolve, reject) => {
+        axios.post(apiBase + '/state/' + data.id, {
+          done: data.done
+        })
+          .then(response => {
+            dispatch('getTodoItems').then(() => resolve())
+          })
+          .catch(error => {
+            reject(new Error('Error accessing API: ' + error))
+          })
+      })
+    },
+    deleteTodo: ({state, dispatch, commit}, id) => {
+      return new Promise((resolve, reject) => {
+        axios.post(apiBase + '/delete/' + id)
+          .then(response => {
+            commit('setTodoItems', response.data.all)
+            resolve()
+          })
+          .catch(error => {
+            reject(new Error('Error accessing API: ' + error))
+          })
+      })
+    },
+    createTodo: ({state, dispatch}, title) => {
+      return new Promise((resolve, reject) => {
+        axios.post(apiBase + '/create', {
+          'title': title,
+        })
+          .then(response => {
+            dispatch('getTodoItems').then(() => resolve())
+          })
+          .catch(error => {
+            reject(new Error('Error accessing API: ' + error))
+          })
       })
     }
   },
   mutations: {
     setTodoItems: (state, todoItems) => {
       state.todoItems = todoItems
-    },
-    createTodo: (state, title) => {
-      state.todoItems.push({
-        id: state.nextId++,
-        title: title,
-        done: false,
-        deleted: false,
-      })
-    },
-    deleteTodo: (state, id) => {
-      var index = state.todoItems.findIndex(item => item.id === id)
-
-      if (index !== -1) {
-        state.todoItems[index].deleted = true
-      }
     }
   }
 }

@@ -40,7 +40,7 @@ export default {
   },
   methods: {
     createTodo() {
-      store.commit('app/createTodo', this.newTodo)
+      store.dispatch('app/createTodo', this.newTodo)
       this.newTodo = ''
     },
   }

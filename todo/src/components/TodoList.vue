@@ -7,8 +7,8 @@
         class="todo-item"
       >
         <div class="title" :class="{'done': item.done}">{{item.title}}</div>
-        <b-form-checkbox v-model="item.done" />
-        <b-icon-x-circle class="delete" @click="deleteTodo(item.id)" />
+        <b-form-checkbox :checked="item.done" @change="$store.dispatch('app/setTodoState', {id: item.id, done: !item.done})" />
+        <b-icon-x-circle class="delete" @click="$store.dispatch('app/deleteTodo', item.id)" />
       </b-list-group-item>
     </transition-group>
   </b-list-group>
@@ -18,12 +18,7 @@
 import store from '../store'
 
 export default {
-  name: 'TodoList',
-  methods: {
-    deleteTodo(id) {
-      store.commit('app/deleteTodo', id)
-    }
-  }
+  name: 'TodoList'
 }
 </script>
 
